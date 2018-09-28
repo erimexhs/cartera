@@ -23,8 +23,8 @@ class BancoRepository extends ServiceEntityRepository
 
         $em = $this->getEntityManager();
 
-        $banco->setNombre($request->get('nombre'));
-        $banco->setNumeroCuenta($request->get('cuenta'));
+        $banco->setNombre($request->get('agregar-nombre'));
+        $banco->setNumeroCuenta($request->get('agregar-cuenta'));
         $banco->setActivo(true);
         date_default_timezone_set("America/Bogota");
         $banco->setFechaCreacion(new \DateTime(date("Y-m-d H:i:s")));
@@ -40,7 +40,7 @@ class BancoRepository extends ServiceEntityRepository
 
         $banco->setNombre($request->get('nombre'));
         $banco->setNumeroCuenta($request->get('cuenta'));
-        $banco->setActivo(true);
+        $banco->setActivo(($request->get('activo') != null ? true : false));
         $em->persist($banco);
         $em->flush();
         $em->close();

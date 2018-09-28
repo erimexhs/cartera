@@ -5,30 +5,51 @@ $( document ).ready(function() {
     $("#agregar").click(function(e) {
 
         $("#formularios-div").show();
-        agregarFormulario();
     });
 
     $("#guardar").click(function(e) {
 
         guardarBanco();
-        
     });
     
     buscarBancos();
 
+    $("#agregar-nombre").click(function() {
+        $("#agregar-nombre").parent().removeClass("has-error");
+    });
+
+    $("#agregar-cuenta").click(function() {
+        $("#agregar-cuenta").parent().removeClass("has-error");
+    });
+
+    
+
+    $(document).on('click', 'button[data-role=esconder-formulario]',function(){
+
+        $("#formularios-div").hide();
+        $("#agregar-nombre").parent().removeClass("has-error");
+        $("#agregar-cuenta").parent().removeClass("has-error");
+    });
 
     $(document).on('click', 'button[data-role=update]',function(){
 
         var id = $(this).data('id');
         var nombre = $('#'+id).children('td[data-target=nombre]').text();
         var cuenta = $('#'+id).children('td[data-target=cuenta]').text();
+        var activo = $('#'+id).children('td[data-target=activo]').text();
     
+        $('#editar-id').val(id);
         $('#nombre').val(nombre);
         $('#cuenta').val(cuenta);
-        $('#editar-id').val(id);
+        $('#activo').prop('checked', activo == "Si" ? true : false);
     });
 
     $('#save').click(function() {
+
+        var id = $('#editar-id').val();
+        var nombre = $('#nombre').val();
+        var cuenta = $('#cuenta').val();
+        var estaActivo = $('#activo').is( ":checked" );
 
         $.ajax({
 
@@ -37,9 +58,9 @@ $( document ).ready(function() {
         data    : $("#formulario-editar").serialize(),
         success : function(response) {
 
-                    $('#bancos').html('');
-                    buscarBancos();
-                    reiniciarFormulario();
+                    $('#'+id).children('td[data-target=nombre]').text(nombre);
+                    $('#'+id).children('td[data-target=cuenta]').text(cuenta);
+                    $('#'+id).children('td[data-target=activo]').text(estaActivo ? "Si" : "No");
                 }
         });
         
@@ -53,41 +74,28 @@ $( document ).ready(function() {
         var id = $(this).data('id');
         var nombre = $('#'+id).children('td[data-target=nombre]').text();
         var cuenta = $('#'+id).children('td[data-target=cuenta]').text();
+        var activo = $('#'+id).children('td[data-target=activo]').text();
 
-        $('#eliminar-nombre').text(nombre);
-        $('#eliminar-cuenta').text(cuenta);
         $('#eliminar-id').val(id);
-        /*
-        
-        var nombre = $('#'+id).children('td[data-target=nombre]').text();
-        var cuenta = $('#'+id).children('td[data-target=cuenta]').text();
-    
-        $('#nombre').val(nombre);
-        $('#cuenta').val(cuenta);
-        
-        */
+        $('#eliminar-nombre').text(nombre);
+        $('#eliminar-cuenta').text(cuenta); 
+        $('#eliminar-activo').text(activo);
     });
 
 
-    $('#save').click(function() {
+    $('#delete').click(function() {
 
-        /*
         $.ajax({
 
-        url     : "/bancos/update",
+        url     : "/bancos/delete",
         method  : 'POST',
-        data    : $("#formulario-editar").serialize(),
+        data    : $("#formulario-eliminar").serialize(),
         success : function(response) {
-
-                    $('#bancos').html('');
-                    buscarBancos();
-                    reiniciarFormulario();
+                    $('#'+response.data).remove();
                 }
         });
-        */
         
     });
-
 
 });
 
@@ -101,94 +109,66 @@ function buscarBancos() {
 
             $.each(response, function(i, item) {
 
-                $('<tr id="'+item.id+'">').append(
-                                $('<td data-target="nombre">').text(item.nombre),
-                                $('<td data-target="cuenta">').text(item.numeroCuenta),
-                                $('<td>').text(item.activo),
-                                $('<td>').html('<button class="btn btn-info glyphicon glyphicon-edit" data-role="update" data-id="'+item.id+'" data-toggle="modal" data-target="#modal-editar"></button>'),
-                                $('<td>').html('<button class="btn btn-danger glyphicon glyphicon-trash" data-role="delete" data-id="'+item.id+'" data-toggle="modal" data-target="#modal-eliminar"></button>')
-
-                ).appendTo('#bancos');
+                $("#bancos").append(agregarRegistro(item));
             });
         }
     });
 }
 
 
-function agregarFormulario() {
+function guardarBanco() {
+    
+    if(validarCampos()) {
 
-    var idFormulario = 'formulario_' + numeroFormulario;
-
-    var nuevoFormulario = 
-    `<div class="row" id="`+idFormulario+`">
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="nombre_`+numeroFormulario+`">Nombre Banco</label>
-                <input type="text" class="form-control nombre" id="nombre_`+numeroFormulario+`" name="nombre">
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label for="cuenta_`+numeroFormulario+`">Numero Cuenta</label>
-                <input type="text" class="form-control cuenta" id="cuenta_`+numeroFormulario+`" name="cuenta">
-            </div>
-        </div>
-        <br>
-        <div class="col-md-2">
-            <div class="form-group">
-                <button class="btn btn-danger glyphicon glyphicon-trash" onclick="eliminarFormulario('`+idFormulario+`');"></button>
-            </div>
-        </div>
-    </div>`;
-
-    $("#formularios").append(nuevoFormulario);
-
-    numeroFormulario++;
-}
-
-
-window.eliminarFormulario = function(formulario) {
-
-    $('#'+formulario).remove();
-
-    var cantidadFormularios = $("#formularios").children().length;
-
-    if (cantidadFormularios == 0) {
-        reiniciarFormulario();
+        $.ajax({
+            url: "bancos/store",
+            type: 'POST',
+            data: $("#formulario-agregar").serialize(),
+            success: function(response) {
+    
+                $("#bancos").prepend(agregarRegistro(response.data));
+                reiniciarFormulario();
+            }
+        });
     }
     
 }
 
 
-function guardarBanco() {
+function validarCampos() {
 
-    $.ajax({
-        url: "bancos/store",
-        type: 'POST',
-        data: $("#formulario-agregar").serialize(),
-        success: function(data) {
+    var validado = true;
 
-            $('#bancos').html('');
-            buscarBancos();
-            reiniciarFormulario();
-        }
-    });
+    if($("#agregar-nombre").val().trim() == '' || $("#agregar-nombre").val() == null) {
+        $("#agregar-nombre").parent().addClass("has-error");
+        validado = false;
+    }
 
+    if($("#agregar-cuenta").val().trim() == '' || $("#agregar-cuenta").val() == null) {
+        $("#agregar-cuenta").parent().addClass("has-error");
+        validado = false;
+    }
+
+    return validado;
 }
-
 
 function reiniciarFormulario() {
 
-    $('#formularios-div').hide();
-    $('#formularios').html('');
+    $("#agregar-nombre").val('');
+    $("#agregar-cuenta").val('');
+}
 
-    $.each($(".nombre"), function() {
-        this.value = '';
-    });
 
-    $.each($(".cuenta"), function() {
-        this.value = '';
-    });
+function agregarRegistro(banco) {
+
+    var registro = $('<tr id="'+banco["id"]+'">').append(
+        $('<td data-target="nombre">').text(banco["nombre"]),
+        $('<td data-target="cuenta">').text(banco["numeroCuenta"]),
+        $('<td data-target="activo">').text(banco["activo"] ? "Si" : "No"), 
+        $('<td>').html('<button class="btn btn-info glyphicon glyphicon-edit" data-role="update" data-id="'+banco["id"]+'" data-toggle="modal" data-target="#modal-editar"></button>'),
+        $('<td>').html('<button class="btn btn-danger glyphicon glyphicon-trash" data-role="delete" data-id="'+banco["id"]+'" data-toggle="modal" data-target="#modal-eliminar"></button>'));
+
+    return registro;
 }
 
 

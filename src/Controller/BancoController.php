@@ -18,27 +18,15 @@ class BancoController extends AbstractController
      */
     public function index()
     {
-        // lista de todos los bancos en la base de datos
-        //$bancos = $this->getDoctrine()->getRepository(Banco::class)->findAll();
-
-        //print_r($bancos);
-
+        // Vista
         return $this->render('banco/index.html.twig');
-    }
-
-    /**
-     * @Route("/bancos/create", name="bancos/create")
-     */
-    public function create()
-    {
-        return $this->render('banco/create.html.twig');
     }
 
     /**
      * list all banks
      * @Route("/bancos/list", name="bancos/list")
      */
-    public function listaBancos() {
+    public function listarBancos() {
 
         // lista de todos los bancos en la base de datos
         $bancos = $this->getDoctrine()
@@ -46,7 +34,7 @@ class BancoController extends AbstractController
                           ->createQueryBuilder('a')
                           ->getQuery();
                           
-        $result = json_decode(json_encode($bancos->getResult(Query::HYDRATE_ARRAY)), true);
+        $result = $bancos->getResult(Query::HYDRATE_ARRAY);
         return new JsonResponse($result);
     }
 
@@ -56,9 +44,21 @@ class BancoController extends AbstractController
      */
     public function guardarBanco(Request $request) 
     {
+
+        //var_dump($request);
+        //die('jaja');
+
+        
         $banco = new Banco();
         $save = $this->getDoctrine()->getRepository(Banco::class)->save($request, $banco);
-        return new response(json_encode(array('data' => '')));
+        
+        $response = Array();
+        $response["id"] = $save->getId();
+        $response["nombre"] = $save->getNombre();
+        $response["numeroCuenta"] = $save->getNumeroCuenta();
+        $response["activo"] = $save->getActivo();
+        return new JsonResponse(array('data' => $response));
+        
     }
 
     /**
@@ -68,10 +68,21 @@ class BancoController extends AbstractController
     public function actualizarBanco(Request $request) 
     {
         $banco = $this->getDoctrine()->getRepository(Banco::class)->find($request->get('id'));
-        $update = $this->getDoctrine()->getRepository(Banco::class)->update($request, $banco);
-        return new response(json_encode(array('data' => '')));
+        $this->getDoctrine()->getRepository(Banco::class)->update($request, $banco);
+        return new JsonResponse(array('data' => ''));
     }
 
+    /**
+     * Update bank
+     * @Route("/bancos/delete", name="bancos/delete")
+     */
+    public function eliminarBanco(Request $request) 
+    {
+        $banco = $this->getDoctrine()->getRepository(Banco::class)->findOneBy(array('id' => $request->get('id')));
+        $this->getDoctrine()->getManager()->remove($banco);
+        $this->getDoctrine()->getManager()->flush();
+        return new JsonResponse(array('data' => $request->get('id')));
+    }
     
 
 }
