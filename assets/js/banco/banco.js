@@ -83,19 +83,8 @@ $( document ).ready(function() {
     });
 
 
-    $('#delete').click(function() {
-
-        $.ajax({
-
-        url     : "/bancos/delete",
-        method  : 'POST',
-        data    : $("#formulario-eliminar").serialize(),
-        success : function(response) {
-                    $('#'+response.data).remove();
-                }
-        });
-        
-    });
+    borrarBanco();
+    
 
 });
 
@@ -172,3 +161,20 @@ function agregarRegistro(banco) {
 }
 
 
+function borrarBanco() {
+
+    $('#delete').click(function() {
+
+        $.ajax({
+
+        url     : "/bancos/delete",
+        method  : 'POST',
+        data    : $("#formulario-eliminar").serialize(),
+        success : function(response) {
+                    $('#'+response.data).remove();
+                }
+        });
+        
+    });
+
+}

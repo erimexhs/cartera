@@ -45,11 +45,6 @@ class ReciboDeCaja
     /**
      * @ORM\Column(type="boolean")
      */
-    private $activo;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
     private $cerrado;
 
     /**
@@ -123,18 +118,6 @@ class ReciboDeCaja
     public function setCruzado(bool $cruzado): self
     {
         $this->cruzado = $cruzado;
-
-        return $this;
-    }
-
-    public function getActivo(): ?bool
-    {
-        return $this->activo;
-    }
-
-    public function setActivo(bool $activo): self
-    {
-        $this->activo = $activo;
 
         return $this;
     }

@@ -44,11 +44,6 @@ class Glosa
     /**
      * @ORM\Column(type="boolean")
      */
-    private $activo;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
     private $cerrado;
 
     /**
@@ -117,18 +112,6 @@ class Glosa
     public function setDescripcion(string $descripcion): self
     {
         $this->descripcion = $descripcion;
-
-        return $this;
-    }
-
-    public function getActivo(): ?bool
-    {
-        return $this->activo;
-    }
-
-    public function setActivo(bool $activo): self
-    {
-        $this->activo = $activo;
 
         return $this;
     }

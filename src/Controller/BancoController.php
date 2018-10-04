@@ -43,12 +43,7 @@ class BancoController extends AbstractController
      * @Route("/bancos/store", name="bancos/store")
      */
     public function guardarBanco(Request $request) 
-    {
-
-        //var_dump($request);
-        //die('jaja');
-
-        
+    {   
         $banco = new Banco();
         $save = $this->getDoctrine()->getRepository(Banco::class)->save($request, $banco);
         
@@ -83,6 +78,5 @@ class BancoController extends AbstractController
         $this->getDoctrine()->getManager()->flush();
         return new JsonResponse(array('data' => $request->get('id')));
     }
-    
 
 }

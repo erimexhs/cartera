@@ -7,28 +7,15 @@
     .btn-width { width: 100% }
 </style>
 
+
 <div class="container" style="padding-top: 50px">
     <h1>Bancos</h1>
-    </br>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Cuenta</th>
-                <th>Activo</th>
-                <th>Editar</th>
-                <th>Eliminar</th>
-            </tr>
-        </thead>
-        <tbody id="bancos"></tbody>
-    </table>
-    </br>
     </br>
     <form id="formulario-agregar">
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <button type="button" id="agregar" data-role="agregar" class="btn btn-info btn-width">Agregar Banco</button>
+                    <button type="button" id="agregar" data-role="agregar" class="btn btn-primary btn-width">Agregar Banco</button>
                 </div>
             </div>
         </div>
@@ -57,12 +44,26 @@
             </br>
             <div class="row">
                 <div class="col-md-4">
-                    <button type="button" id="guardar" class="btn btn-success btn-width">Guardar</button>
+                    <button type="button" id="guardar" class="btn btn-primary btn-width">Guardar</button>
                 </div>
             </div>
         </div>
     </form>
-
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cuenta</th>
+                <th>Activo</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody id="bancos"></tbody>
+    </table>
+    </br>
+    </br>
+    
     <!-- Modal Editar -->
     <div id="modal-editar" class="modal fade" role="dialog">
         <div class="modal-dialog">
